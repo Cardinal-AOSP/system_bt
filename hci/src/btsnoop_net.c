@@ -104,7 +104,7 @@ void btsnoop_net_write(const void *data, size_t length) {
   pthread_mutex_lock(&client_socket_lock_);
   if (client_socket_btsnoop != -1) {
     do {
-      if ((ret = TEMP_FAILURE_RETRY(send(client_socket_btsnoop, data, length, 0)) == -1 && errno == ECONNRESET) {
+      if ((ret = TEMP_FAILURE_RETRY(send(client_socket_btsnoop, data, length, 0))) == -1 && errno == ECONNRESET) {
         safe_close_(&client_socket_btsnoop);
         LOG_INFO("%s conn closed", __func__);
       }
@@ -180,7 +180,7 @@ static void *listen_fn_(UNUSED_ATTR void *context) {
     }
 
     if ((listen_socket_ != -1) && FD_ISSET(listen_socket_, &sock_fds)) {
-      client_socket = TEMP_FAILURE_RETRY(accept(listen_socket_, NULL, NULL);
+      client_socket = TEMP_FAILURE_RETRY(accept(listen_socket_, NULL, NULL));
       if (client_socket == -1) {
         if (errno == EINVAL || errno == EBADF) {
           LOG_WARN("%s error accepting TCP socket: %s", __func__, strerror(errno));
@@ -193,7 +193,7 @@ static void *listen_fn_(UNUSED_ATTR void *context) {
       struct sockaddr_un cliaddr;
       int length;
 
-      client_socket = accept(listen_socket_local_, (struct sockaddr *)&cliaddr, &length);
+      client_socket = TEMP_FAILURE_RETRY(accept(listen_socket_local_, (struct sockaddr *)&cliaddr, &length));
       if (client_socket == -1) {
         if (errno == EINVAL || errno == EBADF) {
           LOG_WARN("%s error accepting LOCAL socket: %s", __func__, strerror(errno));
