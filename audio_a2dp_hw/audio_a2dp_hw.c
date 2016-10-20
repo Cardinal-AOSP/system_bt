@@ -672,7 +672,6 @@ static ssize_t out_write(struct audio_stream_out *stream, const void* buffer,
 {
     struct a2dp_stream_out *out = (struct a2dp_stream_out *)stream;
     int sent = -1;
-    int us_delay;
     #ifdef BT_AUDIO_SYSTRACE_LOG
     char trace_buf[512];
     #endif
