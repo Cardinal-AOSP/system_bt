@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stddef.h>
 
+#include <log/log.h>
+
 #include "bt_types.h"
 #include "bt_utils.h"
 #include "btm_ble_api.h"
@@ -2455,7 +2457,7 @@ static void btm_ble_parse_adv_data(tBTM_INQ_INFO *p_info, UINT8 *p_data,
 ** Returns          void
 **
 *******************************************************************************/
-void btm_ble_cache_adv_data(tBTM_INQ_RESULTS *p_cur, UINT8 data_len, UINT8 *p, UINT16 evt_type, BOOLEAN extended)
+BOOLEAN btm_ble_cache_adv_data(tBTM_INQ_RESULTS *p_cur, UINT8 data_len, UINT8 *p, UINT16 evt_type, BOOLEAN extended)
 {
     tBTM_BLE_INQ_DATA_CB     *p_le_inq_cb = &p_cur->inq_data;
     UINT8 *p_adv_data_cache;
@@ -2496,6 +2498,7 @@ void btm_ble_cache_adv_data(tBTM_INQ_RESULTS *p_cur, UINT8 data_len, UINT8 *p, U
         p_le_inq_cb->adv_len += data_len;
         memcpy(p_adv_data_cache, p, sizeof(UINT8) * data_len);
     }
+    return TRUE;
 
     /* parse service UUID from adv packet and save it in inq db eir_uuid */
     /* TODO */
@@ -2796,7 +2799,9 @@ BOOLEAN btm_ble_update_inq_result(tINQ_DB_ENT *p_i, UINT8 addr_type, UINT16 evt_
         return FALSE;
     }
 
-    btm_ble_cache_adv_data(p_cur, data_len, p, evt_type, extended);
+    if (!btm_ble_cache_adv_data(p_cur, data_len, p, evt_type, extended)) {
+        return FALSE;
+    }
 
     if(!extended)
     {
